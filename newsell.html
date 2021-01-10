@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <title>REST Client</title> -->
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        box-sizing: border-box;
+    }
+
+    #container {
+        min-height: 100vh;
+
+    }
+
+    .top {
+        height: 50vh;
+        background-color: #abc;
+        position: relative;
+    }
+
+    .buttom {
+        height: 50vh;
+        background-color: #678;
+        position: relative;
+    }
+
+    #divbarcode {
+        width: 12em;
+        height: 4em;
+        background-color: #ff9;
+        position: absolute;
+        bottom: 250px;
+        left: 5%;
+    }
+
+    #divsubmit {
+        width: 12em;
+        height: 4em;
+        background-color: rgb(194, 255, 153);
+        position: absolute;
+        bottom: 150px;
+        left: 5%;
+
+    }
+
+    #divproductname {
+        width: 12em;
+        height: 20em;
+        background-color: #ff9;
+        position: absolute;
+        bottom: 0px;
+        left: 400px;
+
+    }
+
+
+    #divproductprice {
+        width: 12em;
+        height: 20em;
+        background-color: rgb(168, 153, 255);
+        position: absolute;
+        bottom: 0px;
+        left: 700px;
+
+    }
+
+
+    #divquantity {
+        width: 12em;
+        height: 20em;
+        background-color: #ff9;
+        position: absolute;
+        bottom: 0px;
+        left: 1000px;
+
+    }
+
+    #divsum {
+        width: 12em;
+        height: 20em;
+        background-color: rgb(255, 153, 212);
+        position: absolute;
+        bottom: 0px;
+        left: 1300px;
+
+    }
+
+    /* Bottom */
+
+    #divtotal {
+        width: 12em;
+        height: 4em;
+        background-color: rgb(194, 255, 153);
+        position: absolute;
+        bottom: 200px;
+        left: 80%;
+
+    }
+</style>
+
+<body>
+    <div class="container">
+        <form>
+
+
+
+            <!-- Top -->
+            <div class="top">
+                <div id="divbarcode">
+                    <div><label>barcode id</label></div>
+                    <div><input id="idbarcode" type="text" /></div>
+                </div>
+
+                <div id="divsubmit">
+                    <input type="submit" value="@powered by TGvili" />
+                </div>
+
+                <div id="divproductname">
+                    <div> <label>product name</label></div>
+                    <div> <select id="idproductname" Name="nameproductname" size="20"></select></div>
+
+                </div>
+
+
+                <div id="divproductprice">
+                    <div> <label>product price</label></div>
+                    <div> <select id="idproductprice" Name="nameproductprice" size="20"></select></div>
+                </div>
+
+
+
+                <div id="divquantity">
+                    <div> <label>quantity</label></div>
+                    <div><select id="idquantity" Name="namequantity" size="20"></select></div>
+                </div>
+
+
+                <div id="divsum">
+                    <div> <label>sum</label></div>
+                    <div> <select id="idsum" Name="namesum" size="20"></select></div>
+                </div>
+
+
+            </div>
+
+            <!-- Bottom -->
+            <div class="buttom">
+                <div id="divtotal">
+                    <div> <label>total sum</label></div>
+                    <div> <input type="text" id="idTotal" name="nameTotal"> </input></div>
+                </div>
+            </div>
+            <div class="result"></div>
+
+        </form>
+    </div>
+    <script>
+        clearAndSetFucus();
+        document.addEventListener("submit", sendData);
+        function sendData(e) {
+            e.preventDefault();
+            const barcode = document.querySelector("#idbarcode").value;
+
+            //is contain only numbers. This one will allow also for signed and float numbers or empty string:
+            let isnum = /^-?\d*\.?\d*$/.test(barcode + "");
+
+            var ismulti = barcode.charAt(0);
+            // console.log("isnum:" + isnum);
+
+
+            //its a mulplier
+            if (ismulti === '*') {
+                handleMulti(barcode);
+                clearAndSetFucus();
+            }
+
+
+
+            //its defenitally a number
+            else if (isnum && barcode + "".includes(".")) {
+                handleNumber(barcode);
+                clearAndSetFucus();
+            }
+
+            //its defuenitally a number
+            else if (isnum && barcode.length < 6) {
+                handleNumber(barcode);
+                clearAndSetFucus();
+            }
+
+            //its a bar code
+            else {
+                fetch("/add", {
+                    method: "POST", headers: {
+                        Accept: "application/json",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        barcode: barcode
+                    })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        const { result } = data;
+                        document.querySelector(
+                            ".result"
+                        ).innerText = `product name is: ${result.productName}`;
+
+                        //list name
+                        var opt = document.createElement("option");
+                        document.getElementById("idproductname").options.add(opt);
+                        opt.text = `${result.productName}`;
+                        opt.value = `${result.productName}`;
+
+                        //list price
+                        var opt = document.createElement("option");
+                        document.getElementById("idproductprice").options.add(opt);
+                        opt.text = `${result.sellPriceAfterTax}`;
+                        opt.value = `${result.sellPriceAfterTax}`;
+
+                        //list quantity
+                        var opt = document.createElement("option");
+                        document.getElementById("idquantity").options.add(opt);
+                        opt.text = `1`;
+                        opt.value = `1`;
+
+                        //list sum
+                        var opt = document.createElement("option");
+                        document.getElementById("idsum").options.add(opt);
+                        opt.text = `${result.sellPriceAfterTax}`;
+                        opt.value = `${result.sellPriceAfterTax}`;
+
+                        //Total
+                        document.getElementById("idTotal").value = getToatlSum();
+
+
+                    })
+                    .catch(err => console.log(err));
+            }
+            clearAndSetFucus();
+        }
+
+        //Clear the barcode input text and set focus
+        function clearAndSetFucus() {
+            document.querySelector("#idbarcode").value = '';
+            document.querySelector("#idbarcode").focus();
+        }
+
+        //Get total sum of products
+        function getToatlSum() {
+            var list = document.getElementById("idsum");
+            var sum = 0;
+            for (var i = 0; i < list.options.length; i++) {
+                if (list[i].value != 'undefined') {
+                    sum += parseFloat(list[i].value);
+                }
+            }
+            console.log(sum);
+            return sum;
+        }
+        //when its a number
+        function handleNumber(barcode) {
+            //list name
+            var opt = document.createElement("option");
+            document.getElementById("idproductname").options.add(opt);
+            opt.text = "n/a";
+            opt.value = "n/a";
+
+            //list price
+            var opt = document.createElement("option");
+            document.getElementById("idproductprice").options.add(opt);
+            opt.text = `${barcode}`;
+            opt.value = `${barcode}`;
+
+            //list quantity
+            var opt = document.createElement("option");
+            document.getElementById("idquantity").options.add(opt);
+            opt.text = `1`;
+            opt.value = `1`;
+
+            //list sum
+            var opt = document.createElement("option");
+            document.getElementById("idsum").options.add(opt);
+            opt.text = `${barcode}`;
+            opt.value = `${barcode}`;
+
+            //Total
+            document.getElementById("idTotal").value = getToatlSum();
+
+        }
+        //when its a *
+        function handleMulti(barcode) {
+            var mulby = barcode.substring(1);
+            console.log("mulby=" + mulby);
+
+
+            //list quantity
+            var i = document.getElementById("idquantity").length;
+            console.log("size of list:" + i);
+            document.getElementById("idquantity").options[i - 1].text = mulby;
+            document.getElementById("idquantity").options[i - 1].value = mulby;
+
+
+            //list sum
+            var price = document.getElementById("idproductprice").options[i - 1].value;
+            var s = parseFloat(price) * parseFloat(mulby);
+            document.getElementById("idsum").options[i - 1].text = s;
+            document.getElementById("idsum").options[i - 1].value = s;
+
+
+            //Total
+            document.getElementById("idTotal").value = getToatlSum();
+
+
+        }
+
+    </script>
+</body>
+
+</html>

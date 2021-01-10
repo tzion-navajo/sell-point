@@ -1,0 +1,21 @@
+[
+    {
+        "barKod": "1c",
+        "productName": "Chai",
+        "sellPriceAfterTax": 18,
+        "stock": 39
+    },
+    {
+        "barKod": "2c",
+        "productName": " מרק נמס",
+        "sellPriceAfterTax": 19,
+        "stock": 17
+    },
+    {
+        "barKod": "3c",
+        "productName": "Aniseed Syrup",
+        "sellPriceAfterTax": 10,
+        "stock": 13
+    }
+    
+]
