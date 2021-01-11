@@ -32,7 +32,7 @@
     }
 
     #divbarcode {
-        width: 12em;
+        width: 16em;
         height: 4em;
         background-color: #ff9;
         position: absolute;
@@ -40,15 +40,12 @@
         left: 5%;
     }
 
-    #divsubmit {
-        width: 12em;
-        height: 4em;
-        background-color: rgb(194, 255, 153);
-        position: absolute;
-        bottom: 150px;
-        left: 5%;
+    #idbarcode {
+        font-size: 20px;
 
     }
+
+
 
     #divproductname {
         width: 12em;
@@ -59,6 +56,13 @@
         left: 400px;
 
     }
+
+    #idproductname {
+        font-size: 20px;
+
+    }
+
+
 
 
     #divproductprice {
@@ -71,6 +75,10 @@
 
     }
 
+    #idproductprice {
+        font-size: 20px;
+
+    }
 
     #divquantity {
         width: 12em;
@@ -79,6 +87,11 @@
         position: absolute;
         bottom: 0px;
         left: 1000px;
+
+    }
+
+    #idquantity {
+        font-size: 20px;
 
     }
 
@@ -92,15 +105,34 @@
 
     }
 
+    #idsum {
+        font-size: 20px;
+
+    }
+
     /* Bottom */
 
     #divtotal {
-        width: 12em;
+        width: 20em;
         height: 4em;
         background-color: rgb(194, 255, 153);
         position: absolute;
         bottom: 200px;
-        left: 80%;
+        left: 70%;
+
+    }
+
+    #idTotal {
+        font-size: 24px;
+
+    }
+
+    #divsubmit {
+        width: 20em;
+        height: 2em;
+        position: absolute;
+        bottom: 50px;
+        left: 40%;
 
     }
 </style>
@@ -118,33 +150,31 @@
                     <div><input id="idbarcode" type="text" /></div>
                 </div>
 
-                <div id="divsubmit">
-                    <input type="submit" value="@powered by TGvili" />
-                </div>
+
 
                 <div id="divproductname">
                     <div> <label>product name</label></div>
-                    <div> <select id="idproductname" Name="nameproductname" size="20"></select></div>
+                    <div> <select id="idproductname" Name="nameproductname" size="11"></select></div>
 
                 </div>
 
 
                 <div id="divproductprice">
                     <div> <label>product price</label></div>
-                    <div> <select id="idproductprice" Name="nameproductprice" size="20"></select></div>
+                    <div> <select id="idproductprice" Name="nameproductprice" size="11"></select></div>
                 </div>
 
 
 
                 <div id="divquantity">
                     <div> <label>quantity</label></div>
-                    <div><select id="idquantity" Name="namequantity" size="20"></select></div>
+                    <div><select id="idquantity" Name="namequantity" size="11"></select></div>
                 </div>
 
 
                 <div id="divsum">
                     <div> <label>sum</label></div>
-                    <div> <select id="idsum" Name="namesum" size="20"></select></div>
+                    <div> <select id="idsum" Name="namesum" size="11"></select></div>
                 </div>
 
 
@@ -156,6 +186,11 @@
                     <div> <label>total sum</label></div>
                     <div> <input type="text" id="idTotal" name="nameTotal"> </input></div>
                 </div>
+
+                <div id="divsubmit">
+                    <input type="submit" value="" />
+                </div>
+
             </div>
             <div class="result"></div>
 
@@ -174,25 +209,33 @@
             var ismulti = barcode.charAt(0);
             // console.log("isnum:" + isnum);
 
+            //contact us
+            if (barcode === "who") {
+                alert("contact us: tziongvilitools@gmail.com ");
+                return;
+            }
 
             //its a mulplier
             if (ismulti === '*') {
                 handleMulti(barcode);
                 clearAndSetFucus();
+                return;
             }
 
 
 
             //its defenitally a number
-            else if (isnum && barcode + "".includes(".")) {
+            if (isnum && (barcode + "").includes(".")&& barcode.length <12) {
                 handleNumber(barcode);
                 clearAndSetFucus();
+                return;
             }
 
             //its defuenitally a number
-            else if (isnum && barcode.length < 6) {
+            if (isnum && barcode.length < 8) {
                 handleNumber(barcode);
                 clearAndSetFucus();
+                return;
             }
 
             //its a bar code
@@ -249,6 +292,22 @@
 
         //Clear the barcode input text and set focus
         function clearAndSetFucus() {
+            var size = 11 + 1;
+            var i = document.getElementById("idproductname").options.length;
+            console.log(" i = " + i);
+
+            // document.getElementById("idproductname").selectedIndex = i; 
+            document.getElementById("idproductname").scrollTop = i * size;
+
+            // document.getElementById("idproductprice").selectedIndex = i; 
+            document.getElementById("idproductprice").scrollTop = i * size;
+
+            // document.getElementById("idquantity").selectedIndex = i; 
+            document.getElementById("idquantity").scrollTop = i * size;
+
+            // document.getElementById("idsum").selectedIndex = i; 
+            document.getElementById("idsum").scrollTop = i * size;
+
             document.querySelector("#idbarcode").value = '';
             document.querySelector("#idbarcode").focus();
         }
@@ -258,20 +317,24 @@
             var list = document.getElementById("idsum");
             var sum = 0;
             for (var i = 0; i < list.options.length; i++) {
-                if (list[i].value != 'undefined') {
+                if (list[i].value != 'undefined' && list[i].value != "") {
+
                     sum += parseFloat(list[i].value);
+
+
                 }
             }
-            console.log(sum);
-            return sum;
+            // console.log(sum);
+            var x = sum.toFixed(2);
+            return x;
         }
         //when its a number
         function handleNumber(barcode) {
             //list name
             var opt = document.createElement("option");
             document.getElementById("idproductname").options.add(opt);
-            opt.text = "n/a";
-            opt.value = "n/a";
+            opt.text = "varios";
+            opt.value = "varios";
 
             //list price
             var opt = document.createElement("option");
